@@ -1,8 +1,8 @@
 # Albert Ctool Plugin
 
-在 [Albert Launcher](https://albertlauncher.github.io/) 中快速访问 [Ctool](https://ctool.dev) 开发者工具集。
+在 [Albert Launcher](https://albertlauncher.github.io/) 中快速访问 [Ctool](https://github.com/baiy/Ctool) 开发者工具集。
 
-Ctool 是一款程序开发常用工具，支持 JSON 格式化、哈希、加解密、Base64、正则表达式、二维码等 50+ 种工具。
+本地部署 Ctool，选中工具后在弹窗中直接使用，无需浏览器。
 
 ## 功能
 
@@ -69,7 +69,7 @@ ct base64     → 筛选 Base64 相关工具
 ct 时间       → 筛选时间相关工具（支持中文搜索）
 ```
 
-选中工具后回车，自动在浏览器中打开对应的 Ctool 页面。
+选中工具后回车，弹窗直接打开对应的 Ctool 工具页面，无需浏览器，支持离线使用。
 
 ### 搜索关键词
 

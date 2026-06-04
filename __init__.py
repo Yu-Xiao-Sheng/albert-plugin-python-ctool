@@ -1,25 +1,67 @@
 # -*- coding: utf-8 -*-
 """
-Developer tools powered by Ctool (https://ctool.dev).
+Developer tools powered by Ctool (local instance with popup window).
 
 Synopsis: ct [keyword]
 """
 
+import os
 import subprocess
+import threading
+import time
+from http.server import HTTPServer, SimpleHTTPRequestHandler
 from pathlib import Path
+from socketserver import ThreadingMixIn
 
 from albert import *
 
 md_iid = "5.0"
-md_version = "1.0.0"
+md_version = "2.0.0"
 md_name = "Ctool"
-md_description = "Developer tools powered by Ctool"
+md_description = "Developer tools powered by Ctool (local popup)"
 md_license = "MIT"
 md_url = "https://github.com/Yu-Xiao-Sheng/albert-plugin-python-ctool"
 md_authors = ["@Yu-Xiao-Sheng"]
-md_exec_dependencies = ["xdg-open"]
 
-CTOOL_BASE_URL = "https://ctool.dev"
+CTOOL_PORT = 17321
+PLUGIN_DIR = Path(__file__).parent
+CTOOL_APP_DIR = str(PLUGIN_DIR / "ctool_app")
+CTOOL_BASE_URL = f"http://localhost:{CTOOL_PORT}"
+POPUP_SCRIPT = str(PLUGIN_DIR / "ctool_popup.py")
+POPUP_PYTHON = "/usr/bin/python3"
+
+_server_started = False
+
+
+class _CtoolHandler(SimpleHTTPRequestHandler):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, directory=CTOOL_APP_DIR, **kwargs)
+
+    def end_headers(self):
+        self.send_header('Cache-Control', 'no-cache')
+        super().end_headers()
+
+    def log_message(self, format, *args):
+        pass
+
+
+class _CtoolServer(ThreadingMixIn, HTTPServer):
+    allow_reuse_address = True
+    daemon_threads = True
+
+
+def _ensure_server():
+    global _server_started
+    if _server_started:
+        return
+    try:
+        server = _CtoolServer(("127.0.0.1", CTOOL_PORT), _CtoolHandler)
+        thread = threading.Thread(target=server.serve_forever, daemon=True)
+        thread.start()
+        _server_started = True
+    except OSError:
+        pass  # Port already in use, server already running
+
 
 # (name, category, keywords, url_path, description)
 TOOLS = [
@@ -158,10 +200,11 @@ class Plugin(PluginInstance, GeneratorQueryHandler):
     def __init__(self):
         PluginInstance.__init__(self)
         GeneratorQueryHandler.__init__(self)
+        _ensure_server()
 
     @staticmethod
     def makeIcon():
-        return Icon.image(Path(__file__).parent / "ctool_icon.png")
+        return Icon.image(PLUGIN_DIR / "ctool_icon.png")
 
     def defaultTrigger(self):
         return 'ct '
@@ -202,12 +245,15 @@ class Plugin(PluginInstance, GeneratorQueryHandler):
                 subtext=f"[{cat}] {desc}",
                 icon_factory=Plugin.makeIcon,
                 actions=[
-                    Action("open", "Open in browser",
-                           lambda u=url: self._open_url(u)),
+                    Action("open", "Open in popup",
+                           lambda u=url, n=name: self._open_popup(u, n)),
                 ]
             ))
 
         yield items
 
-    def _open_url(self, url):
-        subprocess.Popen(['xdg-open', url], start_new_session=True)
+    def _open_popup(self, url, title):
+        subprocess.Popen(
+            [POPUP_PYTHON, POPUP_SCRIPT, url, f"Ctool - {title}"],
+            start_new_session=True
+        )
