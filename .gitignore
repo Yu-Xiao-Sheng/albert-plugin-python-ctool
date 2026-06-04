@@ -4,5 +4,3 @@ __pycache__/
 *.so
 .*.swp
 .DS_Store
-ctool_app/
-ctool_chrome.zip

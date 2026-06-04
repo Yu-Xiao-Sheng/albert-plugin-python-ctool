@@ -18,6 +18,15 @@ fi
 ALBERT_VERSION=$(albert --version 2>/dev/null | grep -oP '[\d.]+' || echo "unknown")
 info "Albert ${ALBERT_VERSION} detected."
 
+# Check WebKit2 (required for popup windows)
+if ! python3 -c "import gi; gi.require_version('WebKit2','4.1')" 2>/dev/null; then
+    warn "WebKit2 4.1 not found. Install it:"
+    echo "  Ubuntu/Debian: sudo apt install gir1.2-webkit2-4.1"
+    echo ""
+    read -rp "Continue anyway? [y/N] " ans
+    [[ "$ans" =~ ^[Yy]$ ]] || exit 1
+fi
+
 # Install plugin
 PLUGIN_DIR="$(cd "$(dirname "$0")" && pwd)"
 TARGET_DIR="$HOME/.local/share/albert/python/plugins"

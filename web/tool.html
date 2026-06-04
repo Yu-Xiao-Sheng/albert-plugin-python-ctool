@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Ctool</title>
+  <link rel="stylesheet" href="common.css">
+  <script src="common.js"></script>
+</head>
+<body>
+  <div id="tool-content"></div>
+  <script>
+    (async () => {
+      const params = new URLSearchParams(location.search);
+      const tool = params.get('t');
+      if (!tool) { document.getElementById('tool-content').innerHTML = '<p>未指定工具</p>'; return; }
+      try {
+        const mod = await import('./tools/' + tool + '.js');
+        document.title = mod.title || tool;
+        Tool.init();
+        mod.run(Tool);
+      } catch (e) {
+        document.getElementById('tool-content').innerHTML = '<div class="error show">加载工具失败: ' + e.message + '</div>';
+      }
+    })();
+  </script>
+</body>
+</html>
