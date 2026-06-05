@@ -117,4 +117,4 @@ rm -rf ~/albert-plugin-python-ctool
 
 ## License
 
-MIT
+[CC BY-NC-SA 4.0](https://creativecommons.org/licenses/by-nc-sa/4.0/) — 免费 for personal and open-source use, commercial use prohibited.
