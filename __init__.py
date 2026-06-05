@@ -17,7 +17,7 @@ md_iid = "5.0"
 md_version = "3.0.0"
 md_name = "Ctool"
 md_description = "Developer tools powered by Ctool (local standalone)"
-md_license = "MIT"
+md_license = "CC-BY-NC-SA-4.0"
 md_url = "https://github.com/Yu-Xiao-Sheng/albert-plugin-python-ctool"
 md_authors = ["@Yu-Xiao-Sheng"]
 
